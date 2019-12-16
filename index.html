@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -7,7 +8,69 @@
     <title>Canvas-Demo</title>
     <link rel="stylesheet" href="/style.css">
 </head>
+
 <body>
-    <h1>Hi</h1>
+    <canvas id="canvas" width="300" height="300"></canvas>
+    <script>
+        let canvas = document.getElementById('canvas');
+        canvas.width = document.documentElement.clientWidth
+        canvas.height = document.documentElement.clientHeight
+
+        // 画线
+        let ctx = canvas.getContext('2d');
+        ctx.fillStyle = 'gray'
+        ctx.lineWidth = 5
+        ctx.lineJoin = "round"
+        ctx.lineCap = "round"
+
+        let painting = false
+        let isTouchDevice = 'ontouchstart' in document.documentElement
+        let last
+
+        function drawLine(x1, y1, x2, y2) {
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2)
+            ctx.stroke()
+        }
+
+        if (isTouchDevice === true) {
+            canvas.ontouchmove = (e) => {
+                let x = e.touches[0].clientX
+                let y = e.touches[0].clientY
+                drawLine(last[0], last[1], x, y)
+                last[0] = x
+                last[1] = y
+            }
+        } else {
+            canvas.onmousemove = (e) => {
+                let x = e.clientX
+                let y = e.clientY
+                if (painting === true) {
+                    drawLine(last[0], last[1], x, y)
+                    last[0] = x
+                    last[1] = y
+                }
+            }
+        }
+
+
+        canvas.ontouchstart = (e) => {
+            let x = e.touches[0].clientX
+            let y = e.touches[0].clientY
+            last = [x, y]
+        }
+
+        canvas.onmousedown = (e) => {
+            painting = true
+            last = [e.clientX, e.clientY]
+        }
+
+        canvas.onmouseup = () => {
+            painting = false
+        }
+
+    </script>
 </body>
+
 </html>
